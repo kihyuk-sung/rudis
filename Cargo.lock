@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "client"
+name = "rudis-client"
 version = "0.1.0"
 
 [[package]]
