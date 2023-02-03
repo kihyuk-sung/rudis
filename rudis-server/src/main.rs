@@ -1,4 +1,4 @@
-use std::{net::{TcpListener, TcpStream, SocketAddr}, io::{Result, Read, Write}};
+use std::{net::{TcpListener, TcpStream, SocketAddr}, io::{Result, Read, Write}, str::from_utf8};
 
 fn main() {
     println!("-- rudis server --");
@@ -24,7 +24,7 @@ fn read_data((mut stream, _addr): (TcpStream, SocketAddr)) -> Result<(TcpStream,
 }
 
 fn print_data((stream, data): (TcpStream, [u8; 64])) -> Result<TcpStream> {
-    println!("{:?}", data);
+    println!("{}", from_utf8(&data).unwrap());
     Ok(stream)
 }
 
