@@ -1,4 +1,6 @@
-use std::{net::{TcpListener, TcpStream, SocketAddr}, io::{Result, Read, Write}, str::from_utf8};
+use std::{net::{TcpListener}};
+
+use rudis::stream::{read_data, print_data, write_data};
 
 fn main() {
     println!("-- rudis server --");
@@ -7,27 +9,10 @@ fn main() {
 
     match TcpListener::bind(address)
         .and_then(|l| l.accept())
-        .and_then(read_data)
+        .and_then(|(stream, _addr)| read_data(stream))
         .and_then(print_data)
-        .and_then(write_data) {
+        .and_then(|stream| write_data(stream, "world".as_bytes())) {
             Ok(_) => println!("ok"),
             Err(e) => println!("{}", e),
         }
-}
-
-fn read_data((mut stream, _addr): (TcpStream, SocketAddr)) -> Result<(TcpStream, [u8; 64])> {
-    let mut buf = [0; 64];
-    match stream.read(&mut buf) {
-        Ok(_) => Ok((stream, buf)),
-        Err(_) => todo!(),
-    }
-}
-
-fn print_data((stream, data): (TcpStream, [u8; 64])) -> Result<TcpStream> {
-    println!("{}", from_utf8(&data).unwrap());
-    Ok(stream)
-}
-
-fn write_data(mut stream: TcpStream) -> Result<usize> {
-    stream.write("world".as_bytes())
 }
