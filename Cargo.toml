@@ -3,4 +3,5 @@
 members = [
     "rudis-server",
     "rudis-client",
+    "rudis",
 ]
