@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "rudis-server",
-    "rudis-client",
+    "rudis_server",
+    "rudis_client",
     "rudis",
 ]

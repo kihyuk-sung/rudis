@@ -7,9 +7,9 @@ name = "rudis"
 version = "0.1.0"
 
 [[package]]
-name = "rudis-client"
+name = "rudis_client"
 version = "0.1.0"
 
 [[package]]
-name = "rudis-server"
+name = "rudis_server"
 version = "0.1.0"
