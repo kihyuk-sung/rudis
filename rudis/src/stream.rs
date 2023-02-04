@@ -4,11 +4,11 @@ pub fn read_data(mut stream: TcpStream) -> Result<(TcpStream, [u8; 64])> {
     let mut buf = [0; 64];
     match stream.read(&mut buf) {
         Ok(_) => Ok((stream, buf)),
-        Err(_) => todo!(),
+        Err(e) => Err(e),
     }
 }
 
-pub fn read_full(mut stream: TcpStream, buf: &mut [u8]) -> Result<(TcpStream, &mut [u8])> {
+pub fn read_full(mut stream: TcpStream, buf: &mut [u8]) -> Result<(TcpStream, &[u8])> {
     match stream.read_exact(buf) {
         Ok(_) => Ok((stream, buf)),
         Err(e) => Err(e),
