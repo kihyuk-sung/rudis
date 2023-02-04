@@ -9,6 +9,9 @@ version = "0.1.0"
 [[package]]
 name = "rudis_client"
 version = "0.1.0"
+dependencies = [
+ "rudis",
+]
 
 [[package]]
 name = "rudis_server"
