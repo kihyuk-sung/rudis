@@ -1,4 +1,4 @@
-use std::{net::{TcpListener, TcpStream}, io::{Read, Write, Result}};
+use std::{net::{TcpListener, TcpStream}, io::{Read, Write, Result, self}};
 
 fn main() {
     println!("-- rudis server --");
@@ -12,18 +12,21 @@ fn main() {
             return
         },
     };
-
-    loop {
-        match accept(&listener) {
-            Ok(()) => (),
-            // TODO: UnexpectedEof when client close connection
-            Err(_) => (),
+    listener.set_nonblocking(true).expect("Cannot set non-blocking");
+    
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                println!("accept");
+                one_request(stream).expect("error");
+            },
+            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
+                continue;
+            },
+            Err(e) => panic!("encounteerd IO error: {e}"),
         }
     }
-}
 
-fn accept(listener: &TcpListener) -> Result<()> {
-    listener.accept().and_then(|(stream, _addr)| one_request(stream))
 }
 
 const LEN_OFFSET: usize = 4;
