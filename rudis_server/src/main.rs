@@ -1,5 +1,7 @@
 use std::{net::{TcpListener, TcpStream}, io::{Read, Write, Result, self}};
 
+use rudis::net::{Connection, State};
+
 fn main() {
     println!("-- rudis server --");
 
@@ -13,20 +15,41 @@ fn main() {
         },
     };
     listener.set_nonblocking(true).expect("Cannot set non-blocking");
-    
+
+    let mut tasks = vec![];
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                println!("accept");
-                one_request(stream).expect("error");
+                tasks.push(Connection::init(stream));
             },
-            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-                continue;
-            },
-            Err(e) => panic!("encounteerd IO error: {e}"),
+            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => (),
+            Err(e) => panic!("encounterd IO error: {e}"),
+        }
+
+        while let Some(t) = tasks.pop() {
+            match handle_task(t) {
+                Some(t) => tasks.push(t),
+                None => (),
+            }
         }
     }
 
+}
+
+fn handle_task(mut task: Connection) -> Option<Connection> {
+    match task.state {
+        State::TryReadHeader => {
+            task.try_read_header();
+            Some(task)
+        },
+        State::REQ => {
+            Some(task)
+        },
+        State::RES => {
+            Some(task)
+        },
+        State::END => None,
+    }
 }
 
 const LEN_OFFSET: usize = 4;
