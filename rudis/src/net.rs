@@ -5,6 +5,7 @@ const READ_BUF_SIZE: usize = 4096;
 
 pub enum State {
     TryReadHeader,
+    TryReadData,
     REQ,
     RES,
     END,
@@ -38,7 +39,32 @@ impl Connection {
                     let read_size = u32::from_be_bytes(self.rbuf[0..LEN_OFFSET].try_into().unwrap()) as usize;
                     println!("size: {:?}", read_size);
                     self.read_size = read_size;
-                    self.state = State::END
+                    // NEXT_STATE
+                    self.state = State::TryReadData;
+                    self.current_read_size = 0;
+                }
+            }
+            Err(_) => self.state = State::END,
+        }
+    }
+
+    pub fn try_read_data(&mut self) {
+        match self.stream.read(&mut self.rbuf[LEN_OFFSET + self.current_read_size..LEN_OFFSET + self.read_size]) {
+            Ok(size) => {
+                self.current_read_size += size;
+                if self.current_read_size == self.read_size {
+                    let data = match std::str::from_utf8(&self.rbuf[LEN_OFFSET..LEN_OFFSET + self.read_size]) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            self.state = State::END;
+                            return;
+                        },
+                    };
+                    println!("data: {:?}", data);
+
+                    // NEXT STATE
+                    self.state = State::END;
+                    self.current_read_size = 0;
                 }
             }
             Err(_) => self.state = State::END,

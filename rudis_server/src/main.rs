@@ -42,6 +42,10 @@ fn handle_task(mut task: Connection) -> Option<Connection> {
             task.try_read_header();
             Some(task)
         },
+        State::TryReadData => {
+            task.try_read_data();
+            Some(task)
+        }
         State::REQ => {
             Some(task)
         },
