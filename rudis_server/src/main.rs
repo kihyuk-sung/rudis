@@ -45,7 +45,11 @@ fn handle_task(mut task: Connection) -> Option<Connection> {
         State::TryReadData => {
             task.try_read_data();
             Some(task)
-        }
+        },
+        State::TryWriteData => {
+            task.try_write_data();
+            Some(task)
+        },
         State::REQ => {
             Some(task)
         },
